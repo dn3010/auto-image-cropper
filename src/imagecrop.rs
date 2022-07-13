@@ -1,9 +1,4 @@
-use image::{
-    GenericImageView,
-    DynamicImage,
-    Rgba,
-    ImageResult,
-};
+use image::{DynamicImage, GenericImageView, ImageResult, Rgba};
 
 use std::path::Path;
 
@@ -27,10 +22,8 @@ impl ImageCrop {
         (self.top_left_corner(), self.bottom_right_corner())
     }
 
-    fn is_white(pixel: Rgba<u8>) -> bool {
-        pixel[0] != 255 &&
-        pixel[1] != 255 &&
-        pixel[2] != 255
+    fn is_white_or_transparent(pixel: Rgba<u8>) -> bool {
+        pixel[0] != 255 && pixel[1] != 255 && pixel[2] != 255 && pixel[3] != 0
     }
 
     fn top_left_corner(&self) -> Point {
@@ -44,7 +37,7 @@ impl ImageCrop {
         for x in 0..(self.original.dimensions().0) {
             for y in 0..(self.original.dimensions().1) {
                 let pixel = self.original.get_pixel(x, y);
-                if Self::is_white(pixel) {
+                if Self::is_white_or_transparent(pixel) {
                     return x;
                 }
             }
@@ -56,7 +49,7 @@ impl ImageCrop {
         for y in 0..(self.original.dimensions().1) {
             for x in 0..(self.original.dimensions().0) {
                 let pixel = self.original.get_pixel(x, y);
-                if Self::is_white(pixel) {
+                if Self::is_white_or_transparent(pixel) {
                     return y;
                 }
             }
@@ -79,7 +72,7 @@ impl ImageCrop {
             let mut y = self.original.dimensions().1 as i32 - 1;
             while y >= 0 {
                 let pixel = self.original.get_pixel(x as u32, y as u32);
-                if Self::is_white(pixel) {
+                if Self::is_white_or_transparent(pixel) {
                     return x as u32 + 1;
                 }
                 y -= 1;
@@ -97,7 +90,7 @@ impl ImageCrop {
             let mut x = self.original.dimensions().0 as i32 - 1;
             while x >= 0 {
                 let pixel = self.original.get_pixel(x as u32, y as u32);
-                if Self::is_white(pixel) {
+                if Self::is_white_or_transparent(pixel) {
                     return y as u32 + 1;
                 }
                 x -= 1;
@@ -107,4 +100,3 @@ impl ImageCrop {
         unreachable!();
     }
 }
-
